@@ -15,7 +15,7 @@ Add the dependency to your consuming project:
 <dependency>
     <groupId>com.weinhold</groupId>
     <artifactId>hexagon-collection-spring-boot-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
 </dependency>
 ```
 

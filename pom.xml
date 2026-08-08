@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.weinhold</groupId>
 	<artifactId>hexagon-collection-spring-boot-starter</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>Hexagon Collection Starter</name>
 	<description>Spring Boot starter that adds an /actuator/hexagon endpoint describing the
 		service's ports, adapters and outward contact points at runtime.</description>
