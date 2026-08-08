@@ -193,16 +193,15 @@ public class HexagonCollectionProperties {
         private List<String> primaryPortSuffixes = new ArrayList<>(List.of("UseCase", "UseCases", "InboundPort"));
 
         /** Interface name suffixes that mark a driven (secondary) port. */
-        private List<String> secondaryPortSuffixes = new ArrayList<>(
-                List.of("Port", "OutboundPort", "Gateway", "Repository"));
+        private List<String> secondaryPortSuffixes = new ArrayList<>(List.of("Port", "OutboundPort", "Gateway", "Repository"));
 
         /** Class name suffixes that mark a driving (primary) adapter. */
-        private List<String> primaryAdapterSuffixes = new ArrayList<>(
-                List.of("Controller", "Resource", "Endpoint", "Listener", "Consumer", "Subscriber"));
+        private List<String> primaryAdapterSuffixes =
+            new ArrayList<>(List.of("Controller", "Resource", "Endpoint", "Listener", "Consumer", "Subscriber"));
 
         /** Class name suffixes that mark a driven (secondary) adapter. */
         private List<String> secondaryAdapterSuffixes = new ArrayList<>(
-                List.of("Adapter", "Client", "Gateway", "Repository", "RepositoryImpl", "Dao", "Publisher", "Producer"));
+            List.of("Adapter", "Client", "Gateway", "Repository", "RepositoryImpl", "Dao", "Publisher", "Producer"));
 
         /** Class name suffixes that mark a domain event. */
         private List<String> eventSuffixes = new ArrayList<>(List.of("Event"));

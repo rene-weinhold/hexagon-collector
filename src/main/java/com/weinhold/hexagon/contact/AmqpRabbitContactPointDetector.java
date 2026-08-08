@@ -9,7 +9,6 @@ import static com.weinhold.hexagon.model.Protocol.AMQP;
 import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,8 +59,8 @@ public class AmqpRabbitContactPointDetector implements ContactPointDetector {
         var points = new ArrayList<ContactPointInfo>();
         exchanges.forEach(exchange -> points.add(point(CanonicalKey.amqpExchange(resolve(exchange)), exchange, INBOUND)));
         queues.forEach(queue -> points.add(point(CanonicalKey.amqpQueue(resolve(queue)), queue, INBOUND)));
-        outboundExchanges
-            .forEach(exchange -> points.add(point(CanonicalKey.amqpExchange(resolve(exchange)), exchange, OUTBOUND)));
+        outboundExchanges.forEach(
+            exchange -> points.add(point(CanonicalKey.amqpExchange(resolve(exchange)), exchange, OUTBOUND)));
         return new Contribution("spring-amqp", points);
     }
 

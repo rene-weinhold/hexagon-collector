@@ -17,7 +17,6 @@ import com.weinhold.hexagon.model.Direction;
  * this class produces with {@code provenance: CONVENTION}, so the UI can draw it dashed.
  * Annotations always win: the scanner only consults conventions for types no annotation
  * claimed.
- *
  * <h2>Rules</h2>
  * <ol>
  * <li>A package segment {@code port}/{@code ports} makes an <em>interface</em> a port; a
@@ -80,7 +79,7 @@ public class HexagonConventions {
 
     /** What a type looks like structurally. */
     public enum Stereotype {
-        PORT, ADAPTER, EVENT
+            PORT, ADAPTER, EVENT
     }
 
     /** The verdict for one type; {@code direction} is null for events. */
@@ -119,12 +118,10 @@ public class HexagonConventions {
         // where a class-name suffix is often just house style.
         var direction = directionFrom(segments);
         if (metadata.isInterface() && containsAny(segments, PORT_SEGMENTS)) {
-            return new Classification(Stereotype.PORT,
-                direction != null ? direction : portDirectionFromName(simpleName));
+            return new Classification(Stereotype.PORT, direction != null ? direction : portDirectionFromName(simpleName));
         }
         if (metadata.isConcrete() && containsAny(segments, ADAPTER_SEGMENTS)) {
-            return new Classification(Stereotype.ADAPTER,
-                direction != null ? direction : adapterDirectionFromName(simpleName));
+            return new Classification(Stereotype.ADAPTER, direction != null ? direction : adapterDirectionFromName(simpleName));
         }
 
         // 2. Otherwise fall back to the class name.

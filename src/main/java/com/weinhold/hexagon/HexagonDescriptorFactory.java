@@ -126,7 +126,7 @@ public class HexagonDescriptorFactory {
         // Silently describing nothing is the worst possible outcome: the endpoint answers 200
         // with an empty hexagon and looks like the service simply has no structure.
         log.warn("No base packages to scan: neither 'hexagon.collection.base-packages' is set nor are there "
-                + "auto-configuration packages. /actuator/hexagon will report no ports or adapters.");
+            + "auto-configuration packages. /actuator/hexagon will report no ports or adapters.");
         return List.of();
     }
 
@@ -143,8 +143,8 @@ public class HexagonDescriptorFactory {
         var id = firstText(service.getId(), this.environment.getProperty("spring.application.name"), "application");
         var version = firstText(service.getVersion(), build != null ? build.getVersion() : null);
         var basePackage = basePackages.isEmpty() ? null : basePackages.getFirst();
-        return new ServiceInfo(id, service.getDisplayName(), version, service.getEnvironment(), resolveInstanceId(),
-            basePackage, service.getRepository());
+        return new ServiceInfo(id, service.getDisplayName(), version, service.getEnvironment(), resolveInstanceId(), basePackage,
+            service.getRepository());
     }
 
     /**

@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
  * <p>On the JVM the index is simply absent and the scanner scans as before. Where it is
  * present it is also authoritative and considerably faster than scanning — which is the point
  * open decision 2 of the contract was weighing.
- *
  * <h2>Format</h2>
  * One fully-qualified class name per line; blank lines and {@code #} comments are ignored.
  */
@@ -52,10 +51,8 @@ public final class HexagonComponentIndex {
             var resources = Collections.list(classLoader.getResources(RESOURCE_LOCATION));
             for (var resource : resources) {
                 found = true;
-                try (var reader = new BufferedReader(
-                        new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8))) {
-                    reader.lines().map(HexagonComponentIndex::stripComment).filter(line -> !line.isEmpty())
-                          .forEach(merged::add);
+                try (var reader = new BufferedReader(new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8))) {
+                    reader.lines().map(HexagonComponentIndex::stripComment).filter(line -> !line.isEmpty()).forEach(merged::add);
                 }
             }
         } catch (IOException ex) {

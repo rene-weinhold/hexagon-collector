@@ -5,8 +5,8 @@ import org.jmolecules.architecture.hexagonal.PrimaryAdapter;
 @PrimaryAdapter(name = "Order REST API")
 public class OrderController implements PlaceOrderUseCase {
 
-	@Override
-	public void placeOrder() {
-	}
+    @Override
+    public void placeOrder() {
+    }
 
 }

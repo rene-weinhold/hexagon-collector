@@ -9,7 +9,6 @@ import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.TypeReference;
 import org.springframework.beans.factory.aot.BeanFactoryInitializationAotContribution;
 import org.springframework.beans.factory.aot.BeanFactoryInitializationAotProcessor;
-import org.springframework.beans.factory.aot.BeanFactoryInitializationCode;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -23,14 +22,12 @@ import com.weinhold.hexagon.HexagonScanner;
 /**
  * Runs the hexagon scan at build time and leaves the result in the application, so the
  * endpoint still works after native compilation.
- *
  * <p>This is the answer to the contract's open decision 2 — scan at startup or at build time.
  * The choice made here is <em>both</em>: startup scanning stays the default because it needs
  * no build setup and picks up whatever is actually on the classpath, and the build-time index
  * is written only when Spring's AOT processing runs, which is exactly when runtime scanning
  * would otherwise stop working. Nothing about the JVM behaviour changes; native images gain a
  * working endpoint instead of an empty one.
- *
  * <p>Only the class <em>names</em> are recorded, not the finished descriptor: contact points
  * come from live framework beans (handler mappings, listener registries, the data source) and
  * must still be read at runtime.
@@ -50,15 +47,14 @@ public class HexagonScanAotProcessor implements BeanFactoryInitializationAotProc
             return null;
         }
 
-        var classLoader = beanFactory.getBeanClassLoader() != null ? beanFactory.getBeanClassLoader()
-                : ClassUtils.getDefaultClassLoader();
+        var classLoader =
+            beanFactory.getBeanClassLoader() != null ? beanFactory.getBeanClassLoader() : ClassUtils.getDefaultClassLoader();
         var classNames = new HexagonScanner(basePackages, classLoader,
             new HexagonConventions(properties.getConventions())).relevantClassNames();
         if (classNames.isEmpty()) {
             return null;
         }
-        log.info("Hexagon AOT: indexed {} candidate types into {}", classNames.size(),
-            HexagonComponentIndex.RESOURCE_LOCATION);
+        log.info("Hexagon AOT: indexed {} candidate types into {}", classNames.size(), HexagonComponentIndex.RESOURCE_LOCATION);
         return (generationContext, beanFactoryInitializationCode) -> contribute(generationContext, classNames);
     }
 
@@ -68,14 +64,15 @@ public class HexagonScanAotProcessor implements BeanFactoryInitializationAotProc
      * interfaces can still be read once the classpath is gone.
      */
     public static void contribute(GenerationContext generationContext, List<String> classNames) {
-        generationContext.getGeneratedFiles().addResourceFile(HexagonComponentIndex.RESOURCE_LOCATION,
-            HexagonComponentIndex.render(classNames));
+        generationContext.getGeneratedFiles()
+                         .addResourceFile(HexagonComponentIndex.RESOURCE_LOCATION, HexagonComponentIndex.render(classNames));
 
         var hints = generationContext.getRuntimeHints();
         hints.resources().registerPattern(HexagonComponentIndex.RESOURCE_LOCATION);
         for (var className : classNames) {
-            hints.reflection().registerType(TypeReference.of(className), MemberCategory.INTROSPECT_PUBLIC_METHODS,
-                MemberCategory.INTROSPECT_DECLARED_METHODS);
+            hints.reflection()
+                 .registerType(TypeReference.of(className), MemberCategory.INTROSPECT_PUBLIC_METHODS,
+                     MemberCategory.INTROSPECT_DECLARED_METHODS);
         }
     }
 
@@ -88,7 +85,8 @@ public class HexagonScanAotProcessor implements BeanFactoryInitializationAotProc
         if (environment == null) {
             return new HexagonCollectionProperties();
         }
-        return Binder.get(environment).bind("hexagon.collection", HexagonCollectionProperties.class)
+        return Binder.get(environment)
+                     .bind("hexagon.collection", HexagonCollectionProperties.class)
                      .orElseGet(HexagonCollectionProperties::new);
     }
 

@@ -5,6 +5,6 @@ package com.weinhold.hexagon.conventions.application.port.in;
  */
 public interface PlaceOrderUseCase {
 
-	void placeOrder();
+    void placeOrder();
 
 }

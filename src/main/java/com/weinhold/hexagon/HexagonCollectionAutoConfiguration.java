@@ -49,7 +49,7 @@ import com.weinhold.hexagon.contact.WebFluxInboundContactPointDetector;
 // whichever auto-configuration would have defined one. Names not present are ignored, which
 // is what lets one entry cover both the Boot 3 and Boot 4 package layouts.
 @AutoConfiguration(afterName = { "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration",
-        "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration" })
+    "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration" })
 @ConditionalOnClass(Endpoint.class)
 @EnableConfigurationProperties(HexagonCollectionProperties.class)
 @ConditionalOnProperty(prefix = "hexagon.collection", name = "enabled", matchIfMissing = true)

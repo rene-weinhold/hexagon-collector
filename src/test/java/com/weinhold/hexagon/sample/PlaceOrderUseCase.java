@@ -5,6 +5,6 @@ import org.jmolecules.architecture.hexagonal.PrimaryPort;
 @PrimaryPort(name = "PlaceOrder")
 public interface PlaceOrderUseCase {
 
-	void placeOrder();
+    void placeOrder();
 
 }

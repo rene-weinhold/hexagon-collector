@@ -1,7 +1,6 @@
 package com.weinhold.hexagon.reactive;
 
 import org.jmolecules.architecture.hexagonal.PrimaryAdapter;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +13,14 @@ import reactor.core.publisher.Mono;
 @PrimaryAdapter(name = "Orders API")
 public class ReactiveOrdersController {
 
-	@PostMapping("/api/orders")
-	Mono<String> place() {
-		return Mono.just("created");
-	}
+    @PostMapping("/api/orders")
+    Mono<String> place() {
+        return Mono.just("created");
+    }
 
-	@GetMapping("/api/orders/{id}")
-	Mono<String> get(@PathVariable String id) {
-		return Mono.just(id);
-	}
+    @GetMapping("/api/orders/{id}")
+    Mono<String> get(@PathVariable String id) {
+        return Mono.just(id);
+    }
 
 }

@@ -12,6 +12,7 @@ service.
 Add the dependency to your consuming project:
 
 ```xml
+
 <dependency>
     <groupId>com.weinhold</groupId>
     <artifactId>hexagon-collection-spring-boot-starter</artifactId>
@@ -33,27 +34,65 @@ management:
 
 ```json
 {
-  "schemaVersion": "1.0.0",
-  "generatedAt": "2026-08-07T09:14:22Z",
-  "service": { "id": "orders-service", "basePackage": "com.acme.orders" },
-  "core": {
-    "basePackage": "com.acme.orders.domain",
-    "aggregates": [ { "id": "...Order", "name": "Order", "provenance": "ANNOTATION" } ],
-    "events": { "published": [ { "id": "...OrderPlaced", "name": "OrderPlaced" } ] }
-  },
-  "ports": [
-    { "id": "...PlaceOrderUseCase", "name": "PlaceOrder", "direction": "PRIMARY",
-      "provenance": "ANNOTATION", "operations": ["placeOrder"] }
-  ],
-  "adapters": [
-    { "id": "...OrderController", "name": "Order REST API", "direction": "PRIMARY",
-      "technology": "spring-web", "provenance": "ANNOTATION",
-      "implementsPorts": ["...PlaceOrderUseCase"],
-      "contactPoints": [
-        { "key": "http:POST /api/orders", "protocol": "HTTP", "direction": "INBOUND",
-          "confidence": "HIGH", "attributes": { "method": "POST", "pathTemplate": "/api/orders" } }
-      ] }
-  ]
+    "schemaVersion": "1.0.0",
+    "generatedAt": "2026-08-07T09:14:22Z",
+    "service": {
+        "id": "orders-service",
+        "basePackage": "com.acme.orders"
+    },
+    "core": {
+        "basePackage": "com.acme.orders.domain",
+        "aggregates": [
+            {
+                "id": "...Order",
+                "name": "Order",
+                "provenance": "ANNOTATION"
+            }
+        ],
+        "events": {
+            "published": [
+                {
+                    "id": "...OrderPlaced",
+                    "name": "OrderPlaced"
+                }
+            ]
+        }
+    },
+    "ports": [
+        {
+            "id": "...PlaceOrderUseCase",
+            "name": "PlaceOrder",
+            "direction": "PRIMARY",
+            "provenance": "ANNOTATION",
+            "operations": [
+                "placeOrder"
+            ]
+        }
+    ],
+    "adapters": [
+        {
+            "id": "...OrderController",
+            "name": "Order REST API",
+            "direction": "PRIMARY",
+            "technology": "spring-web",
+            "provenance": "ANNOTATION",
+            "implementsPorts": [
+                "...PlaceOrderUseCase"
+            ],
+            "contactPoints": [
+                {
+                    "key": "http:POST /api/orders",
+                    "protocol": "HTTP",
+                    "direction": "INBOUND",
+                    "confidence": "HIGH",
+                    "attributes": {
+                        "method": "POST",
+                        "pathTemplate": "/api/orders"
+                    }
+                }
+            ]
+        }
+    ]
 }
 ```
 
@@ -65,14 +104,32 @@ an inference.
 ### 1. jMolecules annotations → `provenance: ANNOTATION`
 
 ```java
-@PrimaryPort   interface PlaceOrderUseCase { void placeOrder(); }
-@SecondaryPort interface InventoryPort { void reserveStock(); }
 
-@PrimaryAdapter   class OrderController implements PlaceOrderUseCase { ... }
-@SecondaryAdapter class InventoryRestClient implements InventoryPort { ... }
+@PrimaryPort
+interface PlaceOrderUseCase {
+    void placeOrder();
+}
 
-@AggregateRoot class Order { ... }        // -> core.aggregates
-@DomainEvent   class OrderPlaced { ... }  // -> core.events.published
+@SecondaryPort
+interface InventoryPort {
+    void reserveStock();
+}
+
+@PrimaryAdapter
+class OrderController implements PlaceOrderUseCase { ...
+}
+
+@SecondaryAdapter
+class InventoryRestClient implements InventoryPort { ...
+}
+
+@AggregateRoot
+class Order { ...
+}        // -> core.aggregates
+
+@DomainEvent
+class OrderPlaced { ...
+}  // -> core.events.published
 ```
 
 A bare `@Port`/`@Adapter` with no primary/secondary variant cannot express direction and
@@ -83,17 +140,17 @@ defaults to `SECONDARY`, with a warning.
 Whatever the first pass did not claim is classified by convention, so a service with no
 annotations at all still describes itself:
 
-| Signal | Result |
-|---|---|
-| interface in a `port`/`ports` package | port |
-| concrete class in an `adapter`/`adapters` package | adapter |
-| neighbouring `in`/`inbound`/`primary`/`driving` segment | `PRIMARY` |
-| neighbouring `out`/`outbound`/`secondary`/`driven` segment | `SECONDARY` |
-| interface named `*UseCase` | primary port |
-| interface named `*Port`, `*Gateway`, `*Repository` | secondary port |
-| class named `*Controller`, `*Resource`, `*Endpoint`, `*Listener`, `*Consumer`, `*Subscriber` | primary adapter |
+| Signal                                                                                          | Result            |
+|-------------------------------------------------------------------------------------------------|-------------------|
+| interface in a `port`/`ports` package                                                           | port              |
+| concrete class in an `adapter`/`adapters` package                                               | adapter           |
+| neighbouring `in`/`inbound`/`primary`/`driving` segment                                         | `PRIMARY`         |
+| neighbouring `out`/`outbound`/`secondary`/`driven` segment                                      | `SECONDARY`       |
+| interface named `*UseCase`                                                                      | primary port      |
+| interface named `*Port`, `*Gateway`, `*Repository`                                              | secondary port    |
+| class named `*Controller`, `*Resource`, `*Endpoint`, `*Listener`, `*Consumer`, `*Subscriber`    | primary adapter   |
 | class named `*Adapter`, `*Client`, `*Gateway`, `*Repository`, `*Dao`, `*Publisher`, `*Producer` | secondary adapter |
-| concrete type named `*Event`, or in an `event`/`events` package | domain event |
+| concrete type named `*Event`, or in an `event`/`events` package                                 | domain event      |
 
 Every suffix list is configurable (see below), and the whole pass can be switched off with
 `hexagon.collection.conventions.enabled=false`.
@@ -113,15 +170,15 @@ payload counts as an event if it carries `@DomainEvent` or matches an event name
 `contactPoints` are discovered by per-technology `ContactPointDetector` beans, each gated so
 only the technologies actually present contribute:
 
-| Detector | Finds |
-|---|---|
-| **HTTP inbound (servlet)** | resolved routes from Spring MVC's `RequestMappingHandlerMapping` |
-| **HTTP inbound (reactive)** | the same, from WebFlux's `RequestMappingHandlerMapping` |
-| **HTTP outbound** | declarative `@HttpExchange` interface clients |
-| **Feign** | `@FeignClient` interfaces — the target service comes from the annotation |
-| **Kafka** | `@KafkaListener` topics (INBOUND) and `@SendTo` (OUTBOUND) |
-| **AMQP** | `@RabbitListener` bindings (INBOUND) and `@SendTo` (OUTBOUND) |
-| **JDBC** | `spring.datasource.url` (or `DataSource` metadata) attached to persistence adapters |
+| Detector                    | Finds                                                                               |
+|-----------------------------|-------------------------------------------------------------------------------------|
+| **HTTP inbound (servlet)**  | resolved routes from Spring MVC's `RequestMappingHandlerMapping`                    |
+| **HTTP inbound (reactive)** | the same, from WebFlux's `RequestMappingHandlerMapping`                             |
+| **HTTP outbound**           | declarative `@HttpExchange` interface clients                                       |
+| **Feign**                   | `@FeignClient` interfaces — the target service comes from the annotation            |
+| **Kafka**                   | `@KafkaListener` topics (INBOUND) and `@SendTo` (OUTBOUND)                          |
+| **AMQP**                    | `@RabbitListener` bindings (INBOUND) and `@SendTo` (OUTBOUND)                       |
+| **JDBC**                    | `spring.datasource.url` (or `DataSource` metadata) attached to persistence adapters |
 
 ### Confidence is earned, not assumed
 
@@ -151,22 +208,22 @@ Properties are bound under the `hexagon.collection` prefix:
 hexagon:
   collection:
     enabled: true                      # set false to disable the endpoint entirely
-    base-packages: [com.acme.orders]   # defaults to the app's auto-configuration packages
+    base-packages: [ com.acme.orders ]   # defaults to the app's auto-configuration packages
     service:
       display-name: Orders
       version: 3.4.1                   # defaults to build-info version when present
       environment: prod
       instance-id: orders-7d9f4c-x2k   # defaults to spring.application.instance-id, then $HOSTNAME
       repository: https://github.com/acme/orders-service
-    targets:                           # resolve outbound HTTP adapters to logical services
+    targets: # resolve outbound HTTP adapters to logical services
       com.acme.orders.adapter.out.inventory.InventoryClient: inventory-service
     conventions:
       enabled: true
-      primary-adapter-suffixes: [Controller, Resource, Facade]
-      secondary-adapter-suffixes: [Client, Publisher, Repository]
-      primary-port-suffixes: [UseCase]
-      secondary-port-suffixes: [Port, Gateway, Repository]
-      event-suffixes: [Event]
+      primary-adapter-suffixes: [ Controller, Resource, Facade ]
+      secondary-adapter-suffixes: [ Client, Publisher, Repository ]
+      primary-port-suffixes: [ UseCase ]
+      secondary-port-suffixes: [ Port, Gateway, Repository ]
+      event-suffixes: [ Event ]
 ```
 
 `targets` maps an outbound adapter (by fully-qualified class name) to the logical service it
@@ -217,7 +274,6 @@ metadata and are not guessed:
 
 ## Reference documentation
 
-* [`actuator-hexagon-schema.md`](actuator-hexagon-schema.md) — the endpoint contract
 * [jMolecules hexagonal architecture](https://github.com/xmolecules/jmolecules)
 * [Creating Your Own Starter](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)
 * [Spring Boot Actuator endpoints](https://docs.spring.io/spring-boot/reference/actuator/endpoints.html)

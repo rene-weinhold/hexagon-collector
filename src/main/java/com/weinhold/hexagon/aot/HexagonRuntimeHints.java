@@ -37,8 +37,8 @@ public class HexagonRuntimeHints implements RuntimeHintsRegistrar {
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         for (var type : PAYLOAD_TYPES) {
-            hints.reflection().registerType(type, MemberCategory.INVOKE_PUBLIC_METHODS,
-                MemberCategory.INVOKE_DECLARED_CONSTRUCTORS);
+            hints.reflection()
+                 .registerType(type, MemberCategory.INVOKE_PUBLIC_METHODS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS);
         }
         hints.resources().registerPattern(HexagonComponentIndex.RESOURCE_LOCATION);
     }

@@ -1,10 +1,9 @@
 package com.weinhold.hexagon.web;
 
 import org.jmolecules.architecture.hexagonal.PrimaryAdapter;
-
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,20 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 @PrimaryAdapter(name = "Orders API")
 public class OrdersApiController {
 
-	@PostMapping("/api/orders")
-	String place() {
-		return "created";
-	}
+    @PostMapping("/api/orders")
+    String place() {
+        return "created";
+    }
 
-	@GetMapping("/api/orders/{id}")
-	String get(@PathVariable String id) {
-		return id;
-	}
+    @GetMapping("/api/orders/{id}")
+    String get(@PathVariable String id) {
+        return id;
+    }
 
-	/** No method condition, so the route answers all of them and the key can only wildcard. */
-	@RequestMapping("/api/orders/search")
-	String search() {
-		return "[]";
-	}
+    /** No method condition, so the route answers all of them and the key can only wildcard. */
+    @RequestMapping("/api/orders/search")
+    String search() {
+        return "[]";
+    }
 
 }

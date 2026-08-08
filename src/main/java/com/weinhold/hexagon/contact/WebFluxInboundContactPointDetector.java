@@ -42,13 +42,18 @@ public class WebFluxInboundContactPointDetector extends HandlerMappingContactPoi
         if (condition == null) {
             return Set.of();
         }
-        return condition.getPatterns().stream().map(PathPattern::getPatternString)
+        return condition.getPatterns()
+                        .stream()
+                        .map(PathPattern::getPatternString)
                         .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Override
     protected Set<String> methods(RequestMappingInfo info) {
-        return info.getMethodsCondition().getMethods().stream().map(RequestMethod::name)
+        return info.getMethodsCondition()
+                   .getMethods()
+                   .stream()
+                   .map(RequestMethod::name)
                    .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

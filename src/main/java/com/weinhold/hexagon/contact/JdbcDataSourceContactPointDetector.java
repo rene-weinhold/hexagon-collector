@@ -56,14 +56,14 @@ public class JdbcDataSourceContactPointDetector implements ContactPointDetector 
     /** How firmly the adapter was identified as the thing that talks to the database. */
     private enum Match {
 
-        /** Declared: {@code @Repository} (jMolecules) or a Spring Data repository type. */
-        DECLARED,
+            /** Declared: {@code @Repository} (jMolecules) or a Spring Data repository type. */
+            DECLARED,
 
-        /** Guessed from the class name alone. */
-        CONVENTION,
+            /** Guessed from the class name alone. */
+            CONVENTION,
 
-        /** Not a persistence adapter. */
-        NONE
+            /** Not a persistence adapter. */
+            NONE
 
     }
 
@@ -77,8 +77,8 @@ public class JdbcDataSourceContactPointDetector implements ContactPointDetector 
         if (parsed == null) {
             return Contribution.none();
         }
-        var point = new ContactPointInfo(jdbc(parsed.vendor(), parsed.database()), JDBC, OUTBOUND,
-            confidence(parsed, match), null, attributes(parsed));
+        var point = new ContactPointInfo(jdbc(parsed.vendor(), parsed.database()), JDBC, OUTBOUND, confidence(parsed, match),
+            null, attributes(parsed));
         return new Contribution("jdbc", List.of(point));
     }
 

@@ -7,6 +7,6 @@ package com.weinhold.hexagon.conventions.application;
  */
 public interface Readable {
 
-	void findById();
+    void findById();
 
 }

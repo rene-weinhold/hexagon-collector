@@ -49,7 +49,6 @@ import com.weinhold.hexagon.model.Provenance;
  * Turns the types in the base packages into the endpoint's structural model: hexagonal
  * {@link PortInfo}/{@link AdapterInfo} entries and the DDD {@link CoreInfo} (aggregates and
  * domain events).
- *
  * <h2>Two passes, in this order</h2>
  * <ol>
  * <li><b>Annotations.</b> Types carrying jMolecules {@code @Port}/{@code @Adapter} (directly
@@ -77,8 +76,8 @@ public class HexagonScanner {
      * because only {@code @EventListener} is guaranteed to be on the classpath.
      */
     private static final List<String> LISTENER_ANNOTATIONS = List.of("org.springframework.context.event.EventListener",
-        "org.springframework.transaction.event.TransactionalEventListener",
-        "org.springframework.kafka.annotation.KafkaListener", "org.springframework.amqp.rabbit.annotation.RabbitListener");
+        "org.springframework.transaction.event.TransactionalEventListener", "org.springframework.kafka.annotation.KafkaListener",
+        "org.springframework.amqp.rabbit.annotation.RabbitListener");
 
     private final Collection<String> basePackages;
 
@@ -119,7 +118,7 @@ public class HexagonScanner {
         var relevant = new ArrayList<String>();
         candidates().forEach((className, metadata) -> {
             if (annotationStereotype(metadata) != null || this.conventions.classify(className, metadata) != null
-                    || hasListenerMethods(metadata)) {
+                || hasListenerMethods(metadata)) {
                 relevant.add(className);
             }
         });
@@ -155,9 +154,8 @@ public class HexagonScanner {
         return new ScanResult(ports, adapters, adapterTypes, buildCore(aggregates, published, consumed));
     }
 
-    private void annotationPass(Map<String, AnnotationMetadata> candidates, List<PortInfo> ports,
-        List<AdapterCandidate> adapters, List<ComponentInfo> aggregates, List<ComponentInfo> published,
-        Set<String> claimed) {
+    private void annotationPass(Map<String, AnnotationMetadata> candidates, List<PortInfo> ports, List<AdapterCandidate> adapters,
+        List<ComponentInfo> aggregates, List<ComponentInfo> published, Set<String> claimed) {
         for (var entry : candidates.entrySet()) {
             var className = entry.getKey();
             var metadata = entry.getValue();
@@ -193,8 +191,8 @@ public class HexagonScanner {
         }
     }
 
-    private void conventionPass(Map<String, AnnotationMetadata> candidates, List<PortInfo> ports,
-        List<AdapterCandidate> adapters, List<ComponentInfo> published, Set<String> claimed) {
+    private void conventionPass(Map<String, AnnotationMetadata> candidates, List<PortInfo> ports, List<AdapterCandidate> adapters,
+        List<ComponentInfo> published, Set<String> claimed) {
         if (!this.conventions.isEnabled()) {
             return;
         }
@@ -211,22 +209,21 @@ public class HexagonScanner {
                 case PORT -> {
                     var type = load(className);
                     if (type != null) {
-                        ports.add(new PortInfo(className, type.getSimpleName(), classification.direction(),
-                            Provenance.CONVENTION, operations(type)));
+                        ports.add(new PortInfo(className, type.getSimpleName(), classification.direction(), Provenance.CONVENTION,
+                            operations(type)));
                         claimed.add(className);
                     }
                 }
                 case ADAPTER -> {
                     var type = load(className);
                     if (type != null) {
-                        adapters.add(new AdapterCandidate(type, type.getSimpleName(), classification.direction(),
-                            Provenance.CONVENTION));
+                        adapters.add(
+                            new AdapterCandidate(type, type.getSimpleName(), classification.direction(), Provenance.CONVENTION));
                         claimed.add(className);
                     }
                 }
                 case EVENT -> {
-                    published.add(new ComponentInfo(className, HexagonConventions.simpleName(className),
-                        Provenance.CONVENTION));
+                    published.add(new ComponentInfo(className, HexagonConventions.simpleName(className), Provenance.CONVENTION));
                     claimed.add(className);
                 }
             }
@@ -315,7 +312,7 @@ public class HexagonScanner {
         publishedEvents.sort(Comparator.comparing(ComponentInfo::id));
 
         var events = (publishedEvents.isEmpty() && consumedEvents.isEmpty()) ? null
-                : new EventsInfo(List.copyOf(publishedEvents), List.copyOf(consumedEvents));
+            : new EventsInfo(List.copyOf(publishedEvents), List.copyOf(consumedEvents));
         if (aggregates.isEmpty() && events == null) {
             return null;
         }
@@ -339,7 +336,8 @@ public class HexagonScanner {
             return fromIndex(index);
         }
         if (NativeDetector.inNativeImage()) {
-            log.warn("Running in a native image without a hexagon component index ({}): classpath scanning cannot "
+            log.warn(
+                "Running in a native image without a hexagon component index ({}): classpath scanning cannot "
                     + "work here, so /actuator/hexagon will be empty. Build with Spring's AOT processing enabled.",
                 HexagonComponentIndex.RESOURCE_LOCATION);
             return Map.of();
@@ -372,7 +370,7 @@ public class HexagonScanner {
         };
         // Everything is a candidate: the two passes decide, not the scan. Reading metadata is
         // what costs here, and the filter would not have saved that.
-        provider.addIncludeFilter((TypeFilter) (metadataReader, metadataReaderFactory) -> true);
+        provider.addIncludeFilter((metadataReader, metadataReaderFactory) -> true);
 
         var found = new LinkedHashMap<String, AnnotationMetadata>();
         for (String basePackage : this.basePackages) {
@@ -382,7 +380,7 @@ public class HexagonScanner {
             for (BeanDefinition definition : provider.findCandidateComponents(basePackage)) {
                 var className = definition.getBeanClassName();
                 if (className == null || found.containsKey(className)
-                        || !(definition instanceof AnnotatedBeanDefinition annotated)) {
+                    || !(definition instanceof AnnotatedBeanDefinition annotated)) {
                     continue;
                 }
                 found.put(className, annotated.getMetadata());
@@ -395,9 +393,10 @@ public class HexagonScanner {
         if (this.basePackages.isEmpty()) {
             return false;
         }
-        return this.basePackages.stream().filter(StringUtils::hasText)
-                                .anyMatch(basePackage -> className.equals(basePackage)
-                                        || className.startsWith(basePackage + "."));
+        return this.basePackages.stream()
+                                .filter(StringUtils::hasText)
+                                .anyMatch(
+                                    basePackage -> className.equals(basePackage) || className.startsWith(basePackage + "."));
     }
 
     private Class<?> load(String className) {
@@ -414,7 +413,7 @@ public class HexagonScanner {
     // -------------------------------------------------------------------------------------
 
     private enum Stereotype {
-        PORT, ADAPTER, AGGREGATE, EVENT
+            PORT, ADAPTER, AGGREGATE, EVENT
     }
 
     private record AdapterCandidate(Class<?> type, String name, Direction direction, Provenance provenance) {
@@ -453,12 +452,12 @@ public class HexagonScanner {
         return new AdapterCandidate(type, name, direction, Provenance.ANNOTATION);
     }
 
-    private static ComponentInfo component(String className, AnnotationMetadata metadata,
-        Class<? extends Annotation> variant, Provenance provenance) {
+    private static ComponentInfo component(String className, AnnotationMetadata metadata, Class<? extends Annotation> variant,
+        Provenance provenance) {
         var annotation = metadata.getAnnotations().get(variant);
         var name = annotation.isPresent() ? annotation.getValue("name", String.class).orElse(null) : null;
-        return new ComponentInfo(className,
-            StringUtils.hasText(name) ? name : HexagonConventions.simpleName(className), provenance);
+        return new ComponentInfo(className, StringUtils.hasText(name) ? name : HexagonConventions.simpleName(className),
+            provenance);
     }
 
     private static Direction direction(Class<?> type, MergedAnnotations annotations, Class<? extends Annotation> primary,

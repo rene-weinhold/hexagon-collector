@@ -5,8 +5,8 @@ import org.jmolecules.architecture.hexagonal.SecondaryPort;
 @SecondaryPort
 public interface InventoryPort {
 
-	void reserveStock();
+    void reserveStock();
 
-	void releaseStock();
+    void releaseStock();
 
 }

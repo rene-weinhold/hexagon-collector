@@ -47,7 +47,10 @@ public class SpringWebInboundContactPointDetector extends HandlerMappingContactP
 
     @Override
     protected Set<String> methods(RequestMappingInfo info) {
-        return info.getMethodsCondition().getMethods().stream().map(RequestMethod::name)
+        return info.getMethodsCondition()
+                   .getMethods()
+                   .stream()
+                   .map(RequestMethod::name)
                    .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

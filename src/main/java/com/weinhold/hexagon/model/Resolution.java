@@ -7,16 +7,16 @@ package com.weinhold.hexagon.model;
  */
 public enum Resolution {
 
-    /** Read from the {@code hexagon.collection.targets} mapping. */
-    CONFIG,
+        /** Read from the {@code hexagon.collection.targets} mapping. */
+        CONFIG,
 
-    /**
-     * The adapter names a logical service that a discovery client resolves at runtime, e.g.
-     * {@code @FeignClient(name = "inventory-service")}.
-     */
-    SERVICE_DISCOVERY,
+        /**
+         * The adapter names a logical service that a discovery client resolves at runtime, e.g.
+         * {@code @FeignClient(name = "inventory-service")}.
+         */
+        SERVICE_DISCOVERY,
 
-    /** Declared on the adapter itself, e.g. an explicit URL on the client annotation. */
-    ANNOTATION
+        /** Declared on the adapter itself, e.g. an explicit URL on the client annotation. */
+        ANNOTATION
 
 }
