@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.1.0</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.weinhold</groupId>
+	<artifactId>hexagon-collection-spring-boot-starter</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Hexagon Collection Starter</name>
+	<description>Spring Boot starter that adds an /actuator/hexagon endpoint describing the
+		service's ports, adapters and outward contact points at runtime.</description>
+	<url>https://github.com/weinhold/hexagon-collector</url>
+	<inceptionYear>2026</inceptionYear>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>weinhold</id>
+			<name>René Schanzenbächer</name>
+			<email>rene.schanzenbaecher98@web.de</email>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:git:https://github.com/weinhold/hexagon-collector.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/weinhold/hexagon-collector.git</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/weinhold/hexagon-collector</url>
+	</scm>
+	<properties>
+		<java.version>25</java.version>
+		<jmolecules.version>2025.0.2</jmolecules.version>
+		<!-- Test-only: supplies the @FeignClient annotation the detector is exercised against. -->
+		<spring-cloud-openfeign.version>4.3.0</spring-cloud-openfeign.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.jmolecules</groupId>
+				<artifactId>jmolecules-bom</artifactId>
+				<version>${jmolecules.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+		<!-- Actuator provides the @Endpoint infrastructure the /actuator/hexagon endpoint plugs into. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- The jMolecules hexagonal annotations the endpoint scans for. -->
+		<dependency>
+			<groupId>org.jmolecules</groupId>
+			<artifactId>jmolecules-hexagonal-architecture</artifactId>
+		</dependency>
+
+		<!-- DDD and event annotations for the core (aggregates, domain events) block. -->
+		<dependency>
+			<groupId>org.jmolecules</groupId>
+			<artifactId>jmolecules-ddd</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jmolecules</groupId>
+			<artifactId>jmolecules-events</artifactId>
+		</dependency>
+
+		<!-- Jackson annotations for shaping the contract's JSON (omitting empty fields). -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+
+		<!--
+			Optional: the contact-point detectors compile against these, but each detector
+			bean is gated by @ConditionalOnClass, so consumers only get a detector when they
+			already have the technology. Being optional keeps these off consumers' classpaths.
+		-->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webflux</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.amqp</groupId>
+			<artifactId>spring-rabbit</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Used only to assert the endpoint's JSON contract shape in tests. -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Boots real web contexts so both HTTP-inbound detectors can be tested end to end. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!--
+			The Feign detector reads @FeignClient by name and never compiles against it, so
+			Spring Cloud is a test-only dependency: the starter stays free of a release train
+			that would otherwise have to match the consumer's.
+		-->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-openfeign-core</artifactId>
+			<version>${spring-cloud-openfeign.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<!--
+			Everything a repository needs beyond the jar itself. Kept in a profile so the
+			ordinary build stays fast: `./mvnw install` should not be paying for javadoc.
+			Release with `./mvnw -Prelease deploy`.
+		-->
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- The javadoc here is prose, not a reference manual; doclint
+								would reject the deliberate @code fragments in it. -->
+							<doclint>none</doclint>
+							<quiet>true</quiet>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>
