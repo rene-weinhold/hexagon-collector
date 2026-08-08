@@ -1,5 +1,12 @@
 package com.weinhold.hexagon;
 
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.util.logging.Logger;
+
+import javax.sql.DataSource;
+
+import com.weinhold.hexagon.contact.JdbcDataSourceContactPointDetector;
 import com.weinhold.hexagon.model.HexagonDescriptor;
 import org.junit.jupiter.api.Test;
 
@@ -45,6 +52,79 @@ class HexagonCollectionAutoConfigurationTests {
 					assertThat(descriptor.core().aggregates()).hasSize(1);
 					assertThat(descriptor.core().events().published()).hasSize(1);
 				});
+	}
+
+	@Test
+	void skipsTheJdbcDetectorWhenThereIsNoDatabase() {
+		// javax.sql.DataSource lives in the JDK, so gating on the class alone would have
+		// registered this detector in every application ever built.
+		this.contextRunner
+				.run(context -> assertThat(context).doesNotHaveBean(JdbcDataSourceContactPointDetector.class));
+	}
+
+	@Test
+	void registersTheJdbcDetectorForAConfiguredUrl() {
+		this.contextRunner.withPropertyValues("spring.datasource.url=jdbc:postgresql://db:5432/orders")
+				.run(context -> assertThat(context).hasSingleBean(JdbcDataSourceContactPointDetector.class));
+	}
+
+	@Test
+	void registersTheJdbcDetectorForADataSourceBean() {
+		this.contextRunner.withBean(DataSource.class, StubDataSource::new)
+				.run(context -> assertThat(context).hasSingleBean(JdbcDataSourceContactPointDetector.class));
+	}
+
+	/**
+	 * Enough of a {@link DataSource} to be registered as one. Nothing here is ever called:
+	 * the point is only that a database exists, which is what the condition asks.
+	 */
+	static class StubDataSource implements DataSource {
+
+		@Override
+		public Connection getConnection() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Connection getConnection(String username, String password) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public PrintWriter getLogWriter() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setLogWriter(PrintWriter out) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setLoginTimeout(int seconds) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getLoginTimeout() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Logger getParentLogger() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public <T> T unwrap(Class<T> iface) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isWrapperFor(Class<?> iface) {
+			return false;
+		}
+
 	}
 
 }

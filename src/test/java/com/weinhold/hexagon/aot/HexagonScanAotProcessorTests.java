@@ -12,6 +12,7 @@ import org.springframework.aot.generate.GeneratedFiles.Kind;
 import org.springframework.aot.generate.InMemoryGeneratedFiles;
 import org.springframework.aot.hint.predicate.RuntimeHintsPredicates;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.javapoet.ClassName;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,6 +68,22 @@ class HexagonScanAotProcessorTests {
 	@Test
 	void contributesNothingWhenThereIsNothingToScan() {
 		assertThat(new HexagonScanAotProcessor().processAheadOfTime(new DefaultListableBeanFactory())).isNull();
+	}
+
+	@Test
+	void scansTheApplicationsAutoConfigurationPackagesByDefault() throws Exception {
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+		AutoConfigurationPackages.register(beanFactory, "com.weinhold.hexagon.conventions");
+
+		var contribution = new HexagonScanAotProcessor().processAheadOfTime(beanFactory);
+
+		assertThat(contribution).isNotNull();
+		// The contribution writes files and hints and generates no code, so it has no use for
+		// the initialization code it is handed.
+		contribution.applyTo(this.generationContext, null);
+
+		assertThat(this.generatedFiles.getGeneratedFileContent(Kind.RESOURCE, HexagonComponentIndex.RESOURCE_LOCATION))
+				.contains("com.weinhold.hexagon.conventions.adapter.in.web.OrderWebController");
 	}
 
 }

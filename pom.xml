@@ -170,6 +170,24 @@
 		</dependency>
 	</dependencies>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<!--
+						JDK 23 turned implicit annotation processing off, so without this the
+						spring-boot-configuration-processor sits on the classpath doing nothing
+						and no spring-configuration-metadata.json is produced — no IDE
+						completion or documentation for any hexagon.collection.* property.
+					-->
+					<proc>full</proc>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<profiles>
 		<!--
 			Everything a repository needs beyond the jar itself. Kept in a profile so the
